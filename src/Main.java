@@ -86,7 +86,7 @@ public class Main {
 		headerStyle.setBorderBottom(XSSFCellStyle.BORDER_THIN);
 		XSSFFont font = workbook.createFont(); // 폰트 조정 인스턴스 생성
 		font.setBoldweight((short) 700);
-		font.setFontHeightInPoints((short) 16);
+		font.setFontHeightInPoints((short) 14);
 		headerStyle.setFont(font);
 
 		// 가운데 정렬과 얇은 테두리를 위한 스타일 인스턴스 생성
@@ -97,7 +97,7 @@ public class Main {
 		cellStyle0.setBorderTop(XSSFCellStyle.BORDER_THIN);
 		cellStyle0.setBorderBottom(XSSFCellStyle.BORDER_THIN);
 		XSSFFont font0 = workbook.createFont(); // 폰트 조정 인스턴스 생성
-		font0.setFontHeightInPoints((short) 14);
+		font0.setFontHeightInPoints((short) 12);
 		cellStyle0.setFont(font0);
 
 		// 얇은 테두리를 위한 스타일 인스턴스 생성
@@ -107,46 +107,50 @@ public class Main {
 		cellStyle1.setBorderTop(XSSFCellStyle.BORDER_THIN);
 		cellStyle1.setBorderBottom(XSSFCellStyle.BORDER_THIN);
 		XSSFFont font1 = workbook.createFont(); // 폰트 조정 인스턴스 생성
-		font1.setFontHeightInPoints((short) 14);
+		font1.setFontHeightInPoints((short) 12);
 		cellStyle1.setFont(font1);
 		
 		XSSFRow row = null;
 		XSSFCell cell = null;
 
-		for (int i = 0; i < table.size(); i++) {
+    // 2차는 sheet생성
+    String sheet_name = sqlSession.getConfiguration().getVariables().getProperty("database") + "(" + table.size() + ")";
+    XSSFSheet sheet = workbook.createSheet(sheet_name);
+
+    // 셀별 널비 정하기 헤더 그리기
+    sheet.setColumnWidth((short) 0, (short) 2000);
+    sheet.setColumnWidth((short) 1, (short) 5000);
+    sheet.setColumnWidth((short) 2, (short) 4000);
+    sheet.setColumnWidth((short) 3, (short) 3000);
+    sheet.setColumnWidth((short) 4, (short) 3000);
+    sheet.setColumnWidth((short) 5, (short) 5000);
+    sheet.setColumnWidth((short) 6, (short) 14000);
+
+    // row
+    int row_num = 0;
+
+    for (int i = 0; i < table.size(); i++) {
 			TableName name = table.get(i);
 
-			// 2차는 sheet생성
-			XSSFSheet sheet = workbook.createSheet(name.getTableName());
+			// 타이틀 행들의 셀 병합 처리
+			sheet.addMergedRegion(new CellRangeAddress(row_num, row_num, 0, 1));
+			sheet.addMergedRegion(new CellRangeAddress(row_num, row_num, 2, 6));
+			sheet.addMergedRegion(new CellRangeAddress(row_num+1, row_num+1, 0, 1));
+			sheet.addMergedRegion(new CellRangeAddress(row_num+1, row_num+1, 2, 6));
 
-			// 셀별 널비 정하기 헤더 그리기
-			sheet.setColumnWidth((short) 0, (short) 2000);
-			sheet.setColumnWidth((short) 1, (short) 5000);
-			sheet.setColumnWidth((short) 2, (short) 4000);
-			sheet.setColumnWidth((short) 3, (short) 3000);
-			sheet.setColumnWidth((short) 4, (short) 3000);
-			sheet.setColumnWidth((short) 5, (short) 5000);
-			sheet.setColumnWidth((short) 6, (short) 10000);
-			
-			sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 1));
-			sheet.addMergedRegion(new CellRangeAddress(0, 0, 2, 6));
-			sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 1));
-			sheet.addMergedRegion(new CellRangeAddress(1, 1, 2, 6));
-			
-			// 시트에 타이틀 행을 하나 생성한다.(i 값이 0이면 첫번째 줄에 해당)
-			int k = 0;
-			row = sheet.createRow((short) k++);
+			// 시트에 타이틀 행을 하나 생성한다.
+			row = sheet.createRow((short) row_num++);
 			cell = row.createCell(0);
 			cell.setCellValue("TableName");
 			cell.setCellStyle(headerStyle);
-			
+
 			cell = row.createCell(1);
 			cell.setCellStyle(headerStyle);
-			
+
 			cell = row.createCell(2);
 			cell.setCellValue(name.getTableName());
 			cell.setCellStyle(cellStyle1);
-			
+
 			cell = row.createCell(3);
 			cell.setCellStyle(cellStyle1);
 			cell = row.createCell(4);
@@ -155,19 +159,19 @@ public class Main {
 			cell.setCellStyle(cellStyle1);
 			cell = row.createCell(6);
 			cell.setCellStyle(cellStyle1);
-			
-			row = sheet.createRow((short) k++);
+
+			row = sheet.createRow((short) row_num++);
 			cell = row.createCell(0);
 			cell.setCellValue("Description");
 			cell.setCellStyle(headerStyle);
-			
+
 			cell = row.createCell(1);
 			cell.setCellStyle(headerStyle);
-			
+
 			cell = row.createCell(2);
 			cell.setCellValue(name.getComment());
 			cell.setCellStyle(cellStyle1);
-			
+
 			cell = row.createCell(3);
 			cell.setCellStyle(cellStyle1);
 			cell = row.createCell(4);
@@ -176,9 +180,9 @@ public class Main {
 			cell.setCellStyle(cellStyle1);
 			cell = row.createCell(6);
 			cell.setCellStyle(cellStyle1);
-			
-			
-			row = sheet.createRow((short) k++);
+
+
+			row = sheet.createRow((short) row_num++);
 
 			cell = row.createCell(0);
 			cell.setCellValue("No");
@@ -187,32 +191,32 @@ public class Main {
 			cell = row.createCell(1);
 			cell.setCellValue("FieldName");
 			cell.setCellStyle(headerStyle);
-			
+
 			cell = row.createCell(2);
 			cell.setCellValue("DataType");
 			cell.setCellStyle(headerStyle);
-			
+
 			cell = row.createCell(3);
 			cell.setCellValue("Null");
 			cell.setCellStyle(headerStyle);
-			
+
 			cell = row.createCell(4);
 			cell.setCellValue("Key");
 			cell.setCellStyle(headerStyle);
-			
+
 			cell = row.createCell(5);
 			cell.setCellValue("Extra");
 			cell.setCellStyle(headerStyle);
-			
+
 			cell = row.createCell(6);
 			cell.setCellValue("Comment");
 			cell.setCellStyle(headerStyle);
 
 			List<TableStruct> structList = name.getStruct();
 
-			for (int j = 0; j < structList.size(); j++, k++) {
-				// 시트에 하나의 행을 생성한다(i 값이 0이면 첫번째 줄에 해당)
-				row = sheet.createRow((short) k);
+			for (int j = 0; j < structList.size(); j++, row_num++) {
+				// 시트에 하나의 행을 생성한다
+				row = sheet.createRow((short) row_num);
 
 				TableStruct struct = structList.get(j);
 
@@ -246,6 +250,9 @@ public class Main {
 				cell.setCellValue(struct.getComment());
 				cell.setCellStyle(cellStyle1);
 			}
+
+			// 테이블 마다 2줄 공백 추가
+			row_num += 2;
 		}
 
 		FileOutputStream fos = null;
